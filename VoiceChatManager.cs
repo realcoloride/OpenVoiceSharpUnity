@@ -19,7 +19,11 @@ public class VoiceChatManager : MonoBehaviour
     // steam
     public Lobby? Lobby;
     public bool Connected = false;
+
+    // audio playback
     private Dictionary<SteamId, CircularAudioBuffer<float>> VoiceBuffers = new();
+
+    // fmod
 
     // those are assigned in the editor directly
     public Canvas Canvas;
@@ -49,7 +53,8 @@ public class VoiceChatManager : MonoBehaviour
     {
         // avoid creating clones
         if (GetProfile(friend.Id) != null) return;
-        Debug.Log("create profile for " + friend.Id.ToSafeString());
+
+        // Debug.Log($"Creating profile for {friend.Id.ToSafeString()}");
         Steamworks.Data.Image avatarImage = (Steamworks.Data.Image)await friend.GetMediumAvatarAsync();
 
         // create clone with name steam id
@@ -273,7 +278,6 @@ public class VoiceChatManager : MonoBehaviour
         // handle voice buffers reading (I recommend you thread this!!)
         foreach (SteamId steamId in VoiceBuffers.Keys)
         {
-            Debug.Log("d" + steamId);
             // create all previous profiles
             if (!VoiceBuffers.ContainsKey(steamId)) continue;
 
