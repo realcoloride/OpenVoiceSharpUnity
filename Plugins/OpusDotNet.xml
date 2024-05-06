@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpusDotNet</name>
+    </assembly>
+    <members>
+        <member name="T:OpusDotNet.Application">
+            <summary>
+            Specifies the intended applications.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Application.VoIP">
+            <summary>
+            Process signal for improved speech intelligibility.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Application.Audio">
+            <summary>
+            Favor faithfulness to the original input.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Application.RestrictedLowDelay">
+            <summary>
+            Configure the minimum possible coding delay by disabling certain modes of operation.
+            </summary>
+        </member>
+        <member name="T:OpusDotNet.Bandwidth">
+            <summary>
+            Specifies the bandpasses.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Bandwidth.NarrowBand">
+            <summary>
+            4 kHz passband.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Bandwidth.MediumBand">
+            <summary>
+            6 kHz passband.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Bandwidth.WideBand">
+            <summary>
+            8 kHz passband.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Bandwidth.SuperWideBand">
+            <summary>
+            12 kHz passband.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.Bandwidth.FullBand">
+            <summary>
+            20 kHz passband.
+            </summary>
+        </member>
+        <member name="T:OpusDotNet.ForceChannels">
+            <summary>
+            Specifies the modes for forced mono/stereo.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.ForceChannels.None">
+            <summary>
+            Not forced.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.ForceChannels.Mono">
+            <summary>
+            Forced mono.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.ForceChannels.Stereo">
+            <summary>
+            Forced stereo.
+            </summary>
+        </member>
+        <member name="T:OpusDotNet.OpusDecoder">
+            <summary>
+            Provides audio decoding with Opus.
+            </summary>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.#ctor">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusDecoder"/> instance, with 48000 Hz sample rate and 2 channels.
+            </summary>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.#ctor(System.Double)">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusDecoder"/> instance, with the specified frame size, 48000 Hz sample rate and 2 channels.
+            </summary>
+            <param name="frameSize">The frame size used when encoding, 2.5, 5, 10, 20, 40 or 60 ms.</param>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusDecoder"/> instance, with the specified sample rate and channels.
+            </summary>
+            <param name="sampleRate">The sample rate to decode to, 48000, 24000, 16000, 12000 or 8000 Hz.</param>
+            <param name="channels">The channels to decode to, mono or stereo.</param>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.#ctor(System.Double,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusDecoder"/> instance, with the specified frame size, sample rate and channels.
+            </summary>
+            <param name="frameSize">The frame size used when encoding, 2.5, 5, 10, 20, 40 or 60 ms.</param>
+            <param name="sampleRate">The sample rate to decode to, 48000, 24000, 16000, 12000 or 8000 Hz.</param>
+            <param name="channels">The channels to decode to, mono or stereo.</param>
+        </member>
+        <member name="P:OpusDotNet.OpusDecoder.FrameSize">
+            <summary>
+            Gets the frame size, or null if not specified when constructing the current instance.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusDecoder.SampleRate">
+            <summary>
+            Gets the sample rate, 48000, 24000, 16000, 12000 or 8000 Hz.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusDecoder.Channels">
+            <summary>
+            Gets the channels, mono or stereo.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusDecoder.FEC">
+            <summary>
+            Gets or sets whether to use FEC (forward error correction). NOTE: This can only be set if <see cref="P:OpusDotNet.OpusDecoder.FrameSize"/> is set,
+            and only works if the encoder also uses FEC. You also need to indicate when a packet has been lost
+            (by calling <see cref="M:OpusDotNet.OpusDecoder.Decode(System.Byte[],System.Int32,System.Int32@)"/> with null and -1 as the arguments).
+            </summary>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.Decode(System.Byte[],System.Int32,System.Int32@)">
+            <summary>
+            Decodes an Opus packet, or indicates packet loss (if <see cref="P:OpusDotNet.OpusDecoder.FEC"/> is enabled).
+            </summary>
+            <param name="opusBytes">The Opus packet, or null to indicate packet loss (if <see cref="P:OpusDotNet.OpusDecoder.FEC"/> is enabled).</param>
+            <param name="length">The maximum number of bytes to use from <paramref name="opusBytes"/>, or -1 to indicate packet loss
+            (if <see cref="P:OpusDotNet.OpusDecoder.FEC"/> is enabled).</param>
+            <param name="decodedLength">The length of the decoded audio.</param>
+            <returns>A byte array containing the decoded audio.</returns>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.Decode(System.Byte[],System.Int32,System.Byte[],System.Int32)">
+            <summary>
+            Decodes an Opus packet or any FEC (forward error correction) data.
+            </summary>
+            <param name="opusBytes">The Opus packet, or null to indicate packet loss.</param>
+            <param name="opusLength">The maximum number of bytes to read from <paramref name="opusBytes"/>, or -1 to indicate packet loss.</param>
+            <param name="pcmBytes">The buffer that the decoded audio will be stored in.</param>
+            <param name="pcmLength">The maximum number of bytes to write to <paramref name="pcmBytes"/>.
+            When using FEC (forward error correction) this must be a valid frame size that matches the duration of the missing audio.</param>
+            <returns>The number of bytes written to <paramref name="pcmBytes"/>.</returns>
+        </member>
+        <member name="M:OpusDotNet.OpusDecoder.Dispose">
+            <summary>
+            Releases all resources used by the current instance.
+            </summary>
+        </member>
+        <member name="T:OpusDotNet.OpusEncoder">
+            <summary>
+            Provides audio encoding with Opus.
+            </summary>
+        </member>
+        <member name="M:OpusDotNet.OpusEncoder.#ctor(OpusDotNet.Application)">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusEncoder"/> instance, with the specified intended application, 48000 Hz sample rate and 2 channels.
+            </summary>
+            <param name="application">The intended application.</param>
+        </member>
+        <member name="M:OpusDotNet.OpusEncoder.#ctor(OpusDotNet.Application,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusEncoder"/> instance, with the specified intended application, sample rate and channels.
+            </summary>
+            <param name="application">The intended application.</param>
+            <param name="sampleRate">The sample rate in the input audio, 48000, 24000, 16000, 12000 or 8000 Hz.</param>
+            <param name="channels">The channels in the input audio, mono or stereo.</param>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.Application">
+            <summary>
+            Gets the intended application.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.SampleRate">
+            <summary>
+            Gets the sample rate, 48000, 24000, 16000, 12000 or 8000 Hz.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.Channels">
+            <summary>
+            Gets the channels, mono or stereo.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.Bitrate">
+            <summary>
+            Gets or sets the bitrate, 8000 - 512000 bps.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.VBR">
+            <summary>
+            Gets or sets whether VBR (variable bitrate) is enabled.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.MaxBandwidth">
+            <summary>
+            Gets or sets the maximum bandpass.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.Complexity">
+            <summary>
+            Gets or sets the computational complexity, 0 - 10. Decreasing this will decrease CPU time, at the expense of quality.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.FEC">
+            <summary>
+            Gets or sets whether to use FEC (forward error correction). You need to adjust <see cref="P:OpusDotNet.OpusEncoder.ExpectedPacketLoss"/>
+            before FEC takes effect.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.ExpectedPacketLoss">
+            <summary>
+            Gets or sets the expected packet loss percentage when using FEC (forward error correction). Increasing this will
+            improve quality under loss, at the expense of quality in the absence of packet loss.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.DTX">
+            <summary>
+            Gets or sets whether to use DTX (discontinuous transmission). When enabled the encoder will produce
+            packets with a length of 2 bytes or less during periods of no voice activity.
+            </summary>
+        </member>
+        <member name="P:OpusDotNet.OpusEncoder.ForceChannels">
+            <summary>
+            Gets or sets the forced mono/stereo mode.
+            </summary>
+        </member>
+        <member name="M:OpusDotNet.OpusEncoder.Encode(System.Byte[],System.Int32,System.Int32@)">
+            <summary>
+            Encodes an Opus frame, the frame size must be one of the following: 2.5, 5, 10, 20, 40 or 60 ms.
+            </summary>
+            <param name="pcmBytes">The Opus frame.</param>
+            <param name="length">The maximum number of bytes to use from <paramref name="pcmBytes"/>.</param>
+            <param name="encodedLength">The length of the encoded audio.</param>
+            <returns>A byte array containing the encoded audio.</returns>
+        </member>
+        <member name="M:OpusDotNet.OpusEncoder.Encode(System.Byte[],System.Int32,System.Byte[],System.Int32)">
+            <summary>
+            Encodes an Opus frame, the frame size must be one of the following: 2.5, 5, 10, 20, 40 or 60 ms.
+            </summary>
+            <param name="pcmBytes">The Opus frame.</param>
+            <param name="pcmLength">The maximum number of bytes to read from <paramref name="pcmBytes"/>.</param>
+            <param name="opusBytes">The buffer that the encoded audio will be stored in.</param>
+            <param name="opusLength">The maximum number of bytes to write to <paramref name="opusBytes"/>.
+            This will determine the bitrate in the encoded audio.</param>
+            <returns>The number of bytes written to <paramref name="opusBytes"/>.</returns>
+        </member>
+        <member name="M:OpusDotNet.OpusEncoder.Dispose">
+            <summary>
+            Releases all resources used by the current instance.
+            </summary>
+        </member>
+        <member name="T:OpusDotNet.OpusError">
+            <summary>
+            Specifies the possible errors when using Opus.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.BadArg">
+            <summary>
+            One or more invalid/out of range arguments.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.BufferTooSmall">
+            <summary>
+            Not enough bytes allocated in the buffer.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.InternalError">
+            <summary>
+            An internal error was detected.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.InvalidPacket">
+            <summary>
+            The compressed data passed is corrupted.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.Unimplemented">
+            <summary>
+            Invalid/unsupported request number.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.InvalidState">
+            <summary>
+            An encoder or decoder structure is invalid or already freed.
+            </summary>
+        </member>
+        <member name="F:OpusDotNet.OpusError.AllocFail">
+            <summary>
+            Memory allocation has failed.
+            </summary>
+        </member>
+        <member name="T:OpusDotNet.OpusException">
+            <summary>
+            The exception that is thrown when an Opus error occurs.
+            </summary>
+        </member>
+        <member name="M:OpusDotNet.OpusException.#ctor(System.Int32)">
+            <summary>
+            Initializes a new <see cref="T:OpusDotNet.OpusException"/> instance, with the specified Opus error code.
+            </summary>
+            <param name="errorCode">The Opus error code.</param>
+        </member>
+        <member name="P:OpusDotNet.OpusException.Error">
+            <summary>
+            The Opus error.
+            </summary>
+        </member>
+    </members>
+</doc>
