@@ -1,10 +1,11 @@
+using NAudio.Utils;
 using OpenVoiceSharp;
 using Steamworks;
 using Steamworks.Data;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -22,8 +23,8 @@ public class VoiceChatManager : MonoBehaviour
 
     // audio playback
     private Dictionary<SteamId, CircularAudioBuffer<float>> VoiceBuffers = new();
-
-    // fmod
+    [SerializeField]
+    public bool AllowLoopback = true;
 
     // those are assigned in the editor directly
     public Canvas Canvas;
@@ -91,7 +92,7 @@ public class VoiceChatManager : MonoBehaviour
         // allows us to push voice data & read it when needed
         CircularAudioBuffer<float> buffer = new(BufferSamples, RecommendedChunkAmount.Unity);
 
-        VoiceBuffers.Add(friend.Id, buffer);
+        VoiceBuffers[friend.Id] = buffer;
 
         AudioClip audioClip = AudioClip.Create(
             "Voice",
@@ -126,6 +127,7 @@ public class VoiceChatManager : MonoBehaviour
 
     void Start()
     {
+        VoiceBuffers.Clear();
         UpdatePlayerCountLabel();
 
         // host/leave button
@@ -150,7 +152,6 @@ public class VoiceChatManager : MonoBehaviour
                 UpdatePlayerCountLabel();
 
                 InteractButton.GetComponentInChildren<TextMeshProUGUI>().text = "Host";
-
 
                 return;
             }
@@ -248,7 +249,10 @@ public class VoiceChatManager : MonoBehaviour
 
     void HandleMessageFrom(SteamId steamid, byte[] data)
     {
-        if (steamid == SteamClient.SteamId || !VoiceBuffers.ContainsKey(steamid)) return;
+        if (!AllowLoopback && steamid == SteamClient.SteamId) return;
+
+        if (!VoiceBuffers.ContainsKey(steamid))
+            return;
 
         // decode and convert to float32
         (byte[] decodedData, int decodedLength) = VoiceChatInterface.WhenDataReceived(data, data.Length);
@@ -258,7 +262,10 @@ public class VoiceChatManager : MonoBehaviour
         VoiceUtilities.Convert16BitToFloat(decodedData, samples);
 
         // push to circular voice buffer
-        VoiceBuffers[steamid].PushChunk(samples);
+        var circularBuffer = VoiceBuffers[steamid];
+        circularBuffer.PushChunk(samples);
+
+        VoiceBuffers[steamid] = circularBuffer;
     }
 
     void Update()
@@ -269,21 +276,26 @@ public class VoiceChatManager : MonoBehaviour
         {
             var packet = SteamNetworking.ReadP2PPacket();
             if (!packet.HasValue) continue;
-
+            
             HandleMessageFrom(packet.Value.SteamId, packet.Value.Data);
         }
 
         if (Lobby == null) return;
 
+        var keys = VoiceBuffers.Keys.ToArray();
+
         // handle voice buffers reading (I recommend you thread this!!)
-        foreach (SteamId steamId in VoiceBuffers.Keys)
+        SteamId steamId;
+        for (int i = 0; i < keys.Length; i++)
         {
+            steamId = keys[i];
+
             // create all previous profiles
             if (!VoiceBuffers.ContainsKey(steamId)) continue;
 
             // check if full
             CircularAudioBuffer<float> voiceBuffer = VoiceBuffers[steamId];
-            if (!voiceBuffer.BufferFull) return;
+            if (!voiceBuffer.BufferFull) continue;
 
             // submit to audio clip and play
             AudioSource voiceSource = GetComponentFromProfile<AudioSource>(GetProfile(steamId), "VoiceSource");
@@ -291,6 +303,8 @@ public class VoiceChatManager : MonoBehaviour
             // read all data and play
             voiceSource.clip.SetData(voiceBuffer.ReadAllBuffer(), 0);
             voiceSource.Play();
+
+            VoiceBuffers[steamId] = voiceBuffer;
         }
     }
 }
