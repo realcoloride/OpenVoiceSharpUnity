@@ -1,4 +1,3 @@
-using NAudio.Utils;
 using OpenVoiceSharp;
 using Steamworks;
 using Steamworks.Data;
@@ -24,7 +23,7 @@ public class VoiceChatManager : MonoBehaviour
     // audio playback
     private Dictionary<SteamId, CircularAudioBuffer<float>> VoiceBuffers = new();
     [SerializeField]
-    public bool AllowLoopback = true;
+    public bool AllowLoopback = false;
 
     // those are assigned in the editor directly
     public Canvas Canvas;
